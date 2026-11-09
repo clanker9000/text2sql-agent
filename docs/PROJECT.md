@@ -2,7 +2,8 @@
 
 IS469 team project (2 people: **A** = agent and accuracy, **B** = harness and safety).
 **Deadline: Tue 10 Nov 2026, 12:00 SGT** (internal target 07:00, the rest is buffer).
-Deliverables: written report, group presentation, code.
+Deliverables: report, slides and repo link, uploaded to eLearn under Assignments, plus the live group presentation
+(equal time per student; no speaker notes, scripts or phones; group order is random).
 
 How to install and run things is in the [README](../README.md). This file explains *what* we are doing and *why*.
 
@@ -47,14 +48,15 @@ Four guardrail layers, tested one at a time and stacked:
 
 | Layer | Plain English | What it does |
 |---|---|---|
-| `prompt_rule` | **Ask nicely** | The system prompt tells the model to only read data and ignore instructions inside the data. |
+| `prompt_rule` | **Ask nicely** | The system prompt tells the model to only read data, ignore instructions inside the data, and never return credentials. |
 | `allowlist` | **The bouncer** | Parse the SQL (sqlglot) and only allow a single `SELECT` / `WITH` statement. |
-| `readonly` | **The locked door** | Open the database read-only (sqlite `mode=ro`). |
-| `approval` | **Ask a human** | Any write needs human approval (auto-denied in experiments). |
+| `readonly` | **The locked door** | Open the database read-only (sqlite `mode=ro` plus `PRAGMA query_only`). |
+| `approval` | **Ask a human** | SQLite's authorizer flags anything that isn't a read; a human must approve it (auto-denied in experiments). |
 
-They are tested against ~40 attacks, including **indirect injection** (malicious instructions hidden in table cells,
-which the agent sees during self-check). The contract between the agent and the harness is in
-[HARNESS_INTERFACE.md](HARNESS_INTERFACE.md).
+They are tested against 30 direct SQL attacks (no model) and 25 attack scenarios through the agent, including
+**indirect injection** (malicious instructions hidden in table cells, which the agent sees during self-check).
+The contract between the agent and the harness is in [HARNESS_INTERFACE.md](HARNESS_INTERFACE.md); what was built
+and what it found is in [HARNESS.md](HARNESS.md).
 
 ## Data
 
@@ -81,8 +83,9 @@ Key questions for the report:
 2. What does retrying fix, and what does it never fix (error analysis)?
 3. Do the guardrails cost accuracy? (Run the eval with all layers on and compare.)
 
-Course topics covered: **Topic 7** (agent loop, harness, guardrails, self-correction) and **Topics 5–6**
-(automatic evaluation: "verify first, judge last", with EX as a programmatic check).
+Course topics covered (lesson numbers from the course pack): **Lessons 8–9** (LLM agents: agent loop, harness,
+tool use, self-correction), **Lesson 11** (security and responsible deployment: guardrails) and **Lessons 6–7**
+(evaluating LLMs: "verify first, judge last", with EX as a programmatic check).
 
 ## Rules we agreed on
 
@@ -107,11 +110,11 @@ Course topics covered: **Topic 7** (agent loop, harness, guardrails, self-correc
 - Presentation: first half
 
 **B: harness and safety**
-- The four guardrail layers in `src/harness.py` (currently a stand-in that always opens read-only) and the attack suite
+- The four guardrail layers in `src/harness.py` and the attack suite (`src/attacks.py`)
 - Block and false-block tests
 - **All stats and plots, for both parts** (inputs: `results/<split>/*.jsonl` and `transitions.csv`)
 - Report: harness design, safety results, stats method
-- Presentation: second half, plus a live attack demo
+- Presentation: second half, with a whiteboard walkthrough of one logged attack (no live demo: no phones or scripts allowed)
 
 **Together:** report intro, discussion ("do the guardrails cost accuracy?"), conclusion.
 
