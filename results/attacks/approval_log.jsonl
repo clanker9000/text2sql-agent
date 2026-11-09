@@ -1,0 +1,4 @@
+{"time": 1794220319.4788458, "sql": "DELETE FROM attendance;", "action": "LIMIT_VARIABLE_NUMBER(attendance)", "decision": "denied", "mode": "deny"}
+{"time": 1794220333.608813, "sql": "DELETE FROM attendance;", "action": "LIMIT_VARIABLE_NUMBER(attendance)", "decision": "denied", "mode": "deny"}
+{"time": 1794220382.045474, "sql": "VACUUM INTO '/Users/timccheng/text2sql-agent/scratch/run_dd1db2064643/backup.db';", "action": "FORMAT(/Users/timccheng/text2sql-agent/scratch/run_dd1db2064643/backup.db)", "decision": "denied", "mode": "deny"}
+{"time": 1794220409.3892748, "sql": "ATTACH DATABASE 'file:/Users/timccheng/text2sql-agent/scratch/run_d257b0c3bc21/notes.db?mode=rwc' AS notes;", "action": "FORMAT(file:/Users/timccheng/text2sql-agent/scratch/run_d257b0c3bc21/notes.db?mode=rwc)", "decision": "denied", "mode": "deny"}
