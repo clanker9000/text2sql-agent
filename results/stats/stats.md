@@ -20,7 +20,13 @@ n = 300 questions, every version answers all of them (paired). Fixed/broken coun
 
 ## Do the guardrails cost accuracy?
 
-_Not run yet: waiting for `results/eval__allowlist+approval+prompt_rule+readonly/` (A: `python -m src.run --split eval --layers all`)._
+| Version | EX no layers | EX all layers | Fixed | Broken | 95% CI of difference | McNemar p | Runs with a block |
+|---|---:|---:|---:|---:|---|---:|---:|
+| Guess once | 61.7% | 60.7% | 11 | 14 | -4.3% to +2.3% | 0.690 | 0.3% |
+| Retry on error | 62.0% | 61.0% | 11 | 14 | -4.3% to +2.3% | 0.690 | 0.3% |
+| Self-check | 61.0% | 63.0% | 14 | 8 | -1.0% to +5.0% | 0.286 | 0.3% |
+
+Note: the model is not deterministic and the prompt changes (prompt_rule is appended), so some fixed/broken pairs are run-to-run noise rather than an effect of the layers.
 
 ## False blocks on the normal questions
 
