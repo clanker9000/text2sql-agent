@@ -1,0 +1,5 @@
+openai>=1.40
+sqlglot>=25
+pandas>=2.0
+tqdm>=4.60
+scipy>=1.10

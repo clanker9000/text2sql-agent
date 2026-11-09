@@ -1,0 +1,7 @@
+.env
+cache/
+data/dev_databases/
+data/fake_databases/
+__pycache__/
+results/*/
+data/_download/
