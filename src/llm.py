@@ -84,7 +84,8 @@ def _call_api(messages):
 
 def chat(messages) -> LLMReply:
     key = hashlib.sha256(
-        json.dumps([config.LLM_MODEL, config.LLM_TEMPERATURE, messages], sort_keys=True).encode()
+        json.dumps([config.LLM_MODEL, config.LLM_TEMPERATURE, config.LLM_MAX_TOKENS, messages],
+                   sort_keys=True).encode()
     ).hexdigest()
     hit = _cache.get(key)
     if hit:

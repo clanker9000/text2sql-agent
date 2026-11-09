@@ -3,6 +3,8 @@
 IS469 team project. **A** owns the agent and the accuracy results (`src/agent.py`, `src/scorer.py`, `src/run.py`, `src/summarize.py`).
 **B** owns the guardrail harness and the attack suite (`src/harness.py` + whatever B adds), plus the stats and plots.
 
+> **New here? Start with [docs/PROJECT.md](docs/PROJECT.md)**: the idea, the plan, the rules and the timeline.
+
 ## What's here
 
 | File | What it does |

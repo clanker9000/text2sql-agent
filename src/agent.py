@@ -22,8 +22,13 @@ SYSTEM_PROMPT = (
     "You are an expert data analyst who writes SQLite queries.\n"
     "Answer the user's question with ONE SQLite SELECT query over the given schema.\n"
     "- Use only tables and columns that exist in the schema; quote names with spaces using backticks.\n"
-    "- Use the external knowledge hints: they define terms and formulas used in the question.\n"
-    "- Return only the columns the question asks for, nothing extra.\n"
+    "- Follow the external knowledge hint exactly: if it says a term refers to a column or gives a formula, "
+    "use that column and that formula.\n"
+    "- Return only the columns the question asks for, in that order. Do not add extra columns "
+    "(IDs, names, status, counts) unless the question asks for them.\n"
+    "- Use INNER JOIN unless the question asks to include rows that have no match.\n"
+    "- Return numbers as numbers: use ROUND(x, n) for decimal places and CAST(... AS REAL) for division. "
+    "Never format numbers as text (no printf or string concatenation).\n"
     "Reply with the final query in a single ```sql code block."
 )
 
@@ -137,7 +142,10 @@ def solve(item: dict, condition: str, db_path, layers=frozenset()) -> AgentResul
 
         sql = extract_sql(reply.text)
         last_sql = sql
-        res = harness.execute(sql, db_path, layers=layers)
+        if sql:
+            res = harness.execute(sql, db_path, layers=layers)
+        else:  # empty reply (e.g. a reasoning model ran out of tokens); sqlite would "run" it as a no-op
+            res = harness.ExecResult(ok=False, error="no SQL query found in the reply")
         out.n_exec += 1
         step.update(action="execute", sql=sql, obs=_obs(res))
         out.trajectory.append(step)

@@ -26,8 +26,16 @@ def gold_rows(item, db_path, timeout_s=300):  # eval qid 518 needs ~155s
     qid = item["question_id"]
     with _lock:
         if qid in _gold_cache:
-            return _gold_cache[qid]
-    rows = _run(item["SQL"], db_path, timeout_s)
+            hit = _gold_cache[qid]
+            if isinstance(hit, Exception):   # failures are cached too, so a dead gold query costs one timeout
+                raise hit
+            return hit
+    try:
+        rows = _run(item["SQL"], db_path, timeout_s)
+    except Exception as e:
+        with _lock:
+            _gold_cache[qid] = e
+        raise
     with _lock:
         _gold_cache[qid] = rows
     return rows

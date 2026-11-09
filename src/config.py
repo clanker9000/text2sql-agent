@@ -25,7 +25,7 @@ LLM_BASE_URL = os.getenv("LLM_BASE_URL") or None    # None = api.openai.com
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 _temp = os.getenv("LLM_TEMPERATURE", "0")
 LLM_TEMPERATURE = float(_temp) if _temp != "" else None   # set to empty for models that reject temperature
-LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1024"))
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "4096"))  # reasoning models spend part of this thinking
 
 # --- Data ---
 DATA_FILE = ROOT / "data" / "mini_dev_prompt.jsonl"
