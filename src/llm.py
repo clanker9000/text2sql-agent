@@ -57,7 +57,9 @@ def _get_client():
 
 
 def _call_api(messages):
-    kwargs = dict(model=config.LLM_MODEL, messages=messages, max_tokens=config.LLM_MAX_TOKENS)
+    # OpenAI's newer models only accept max_completion_tokens; other compatible APIs want max_tokens
+    limit_key = "max_completion_tokens" if config.LLM_BASE_URL is None else "max_tokens"
+    kwargs = dict(model=config.LLM_MODEL, messages=messages, **{limit_key: config.LLM_MAX_TOKENS})
     if config.LLM_TEMPERATURE is not None:
         kwargs["temperature"] = config.LLM_TEMPERATURE
     delay = 2

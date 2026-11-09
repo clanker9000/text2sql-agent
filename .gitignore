@@ -5,3 +5,4 @@ data/fake_databases/
 __pycache__/
 results/*/
 data/_download/
+.vscode/

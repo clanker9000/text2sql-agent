@@ -22,7 +22,7 @@ def _run(sql, db_path, timeout_s):
         conn.close()
 
 
-def gold_rows(item, db_path, timeout_s=120):
+def gold_rows(item, db_path, timeout_s=300):  # eval qid 518 needs ~155s
     qid = item["question_id"]
     with _lock:
         if qid in _gold_cache:
