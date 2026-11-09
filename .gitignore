@@ -7,3 +7,4 @@ results/*/
 data/_download/
 .vscode/
 CLAUDE.md
+!results/eval/

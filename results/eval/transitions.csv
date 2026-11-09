@@ -1,0 +1,4 @@
+from,to,fixed (wrong->right),broken (right->wrong),both right,both wrong
+oneshot,retry,1,0,185,114
+retry,selfcheck,5,8,178,109
+oneshot,selfcheck,6,8,177,109
