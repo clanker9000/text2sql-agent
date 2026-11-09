@@ -1,28 +1,38 @@
 # Self-correcting Text-to-SQL agent with a guardrailed harness
 
 IS469 team project. **A** owns the agent and the accuracy results (`src/agent.py`, `src/scorer.py`, `src/run.py`, `src/summarize.py`).
-**B** owns the guardrail harness and the attack suite (`src/harness.py` + whatever B adds), plus the stats and plots.
+**B** owns the guardrail harness and the attack suite (`src/harness.py`, `src/attacks.py`, `src/false_block.py`), plus the stats and plots for both parts (`src/stats.py`).
 
 > **New here? Start with [docs/PROJECT.md](docs/PROJECT.md)**: the idea, the plan, the rules and the timeline.
+> The harness, the attacks and the findings are explained in [docs/HARNESS.md](docs/HARNESS.md).
+
+![Architecture: the agent sends every query through execute(), which applies the guardrail layers in order](docs/figures/architecture.png)
 
 ## What's here
 
 | File | What it does |
 |---|---|
 | `src/agent.py` | The agent: three versions (`oneshot`, `retry`, `selfcheck`) with the same budget of 4 LLM calls. **The prompts you tune are at the top.** |
-| `src/harness.py` | **Stand-in** for B's harness. B replaces the body of `execute()` (see `docs/HARNESS_INTERFACE.md`). |
+| `src/harness.py` | The guardrail harness: `execute()` with four layers (`prompt_rule`, `allowlist`, `readonly`, `approval`). The real databases are always opened read-only. Contract: `docs/HARNESS_INTERFACE.md`. |
+| `src/attacks.py` | Attack suite on throwaway copies: 30 direct SQL payloads (no LLM) and 25 agent scenarios (needs the API key). Full list: `docs/ATTACKS.md`. |
+| `src/false_block.py` | Replays A's predicted SQL through each layer and counts false blocks. No API calls. |
+| `src/stats.py` | All tables and figures for the report: paired bootstrap, exact McNemar, Wilson intervals. Writes `results/stats/`. |
 | `src/scorer.py` | Execution accuracy (the official BIRD metric: same set of result rows as the gold query). |
 | `src/run.py` | Runs a version on a split and logs one JSON line per question to `results/`. Resumable. |
 | `src/summarize.py` | Accuracy/cost table, fixed-vs-broken counts, and a failures sheet for error analysis. |
 | `src/llm.py` | Works with any OpenAI-compatible API. Caches every call on disk, so re-runs are free. |
 | `src/data.py` | Fixed split: **pilot = 30** questions (tune on these only), **eval = 300** (report on these). |
 | `tests/make_fake_dbs.py` | Empty copies of the databases for testing before the real download finishes. |
+| `tests/test_harness.py` | 34 checks on the harness, including that the real databases can never be written. No API key or BIRD files needed. |
+| `docs/figures/` | The architecture diagram (PNG, SVG and the script that draws it). |
 | `data/mini_dev_prompt.jsonl` | The 500 BIRD mini-dev questions with schema, hints and gold SQL (from github.com/bird-bench/mini_dev, CC BY-SA 4.0). |
 
 ## Setup
 
-**1. Install** (Python 3.10+)
+**1. Install** (Python 3.10+), ideally in a virtual environment:
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate        # run this in every new terminal; `deactivate` to leave
 pip install -r requirements.txt
 ```
 
@@ -78,8 +88,29 @@ python -m src.run --split eval --layers all
 python -m src.summarize --split eval__allowlist+approval+prompt_rule+readonly
 ```
 
+## Workflow for B
+
+Full details and the findings are in [docs/HARNESS.md](docs/HARNESS.md). Only the agent tier calls the API.
+```bash
+python tests/test_harness.py                      # 34 checks
+python -m src.false_block                         # replays A's 900 queries through each layer
+python -m src.attacks --tier direct --fresh       # 30 SQL payloads x 6 settings, no API calls
+python -m src.attacks --tier agent --limit 2      # smoke test through the real model
+python -m src.attacks --tier agent --workers 6    # 25 scenarios x 2 versions x 6 settings = 300 runs
+python -m src.stats                               # every table and figure -> results/stats/
+```
+Attacks run on copies under `scratch/` (gitignored) and never touch the files in `DB_ROOT`.
+Run `python -m src.stats` again after the `--layers all` run to add the guardrail-cost comparison.
+
 ## Results format (B reads these for stats and plots)
 `results/<split>[__<layers>]/<condition>.jsonl`: one line per question with
 `qid, db_id, difficulty, condition, layers, model, question, gold_sql, pred_sql, correct, blocked,
 n_llm_calls, n_retries, n_exec, prompt_tokens, completion_tokens, tokens, latency_s, stop_reason, final_exec_ok, trajectory`.
 Every version answers the same questions, so pair them on `qid` (McNemar uses the fixed/broken counts from `transitions.csv`).
+
+B's outputs:
+- `results/attacks/direct.jsonl` and `agent.jsonl`: one line per attack and setting, with `success` (did the attack's goal happen),
+  every harm check (`modified`, `file_written`, `file_created`, `leaked`, `runaway`, `poisoned`), what blocked it, and for the agent
+  tier the full trajectory.
+- `results/false_block/summary.csv`: blocked counts per layer setting and version.
+- `results/stats/stats.md`: every table for the report, plus `*.csv` and `figures/*.png`.
