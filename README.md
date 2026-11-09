@@ -1,7 +1,5 @@
 # Self-correcting Text-to-SQL agent with a guardrailed harness
 
-> Working with Claude Code? Project context, decisions and status are in `CLAUDE.md`.
-
 IS469 team project. **A** owns the agent and the accuracy results (`src/agent.py`, `src/scorer.py`, `src/run.py`, `src/summarize.py`).
 **B** owns the guardrail harness and the attack suite (`src/harness.py` + whatever B adds), plus the stats and plots.
 
@@ -19,7 +17,7 @@ IS469 team project. **A** owns the agent and the accuracy results (`src/agent.py
 | `tests/make_fake_dbs.py` | Empty copies of the databases for testing before the real download finishes. |
 | `data/mini_dev_prompt.jsonl` | The 500 BIRD mini-dev questions with schema, hints and gold SQL (from github.com/bird-bench/mini_dev, CC BY-SA 4.0). |
 
-## Setup (do this together on the call)
+## Setup
 
 **1. Install** (Python 3.10+)
 ```bash
@@ -42,7 +40,7 @@ You want 11 `[ok]` databases, a gold query that returns rows, and the LLM replyi
 
 ## Workflow for A
 
-**Smoke test (on the call):**
+**Smoke test:**
 ```bash
 python -m src.run --split pilot --limit 20 --condition oneshot
 ```

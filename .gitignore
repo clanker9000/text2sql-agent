@@ -6,3 +6,4 @@ __pycache__/
 results/*/
 data/_download/
 .vscode/
+CLAUDE.md
