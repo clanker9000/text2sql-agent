@@ -3,3 +3,5 @@ sqlglot>=25
 pandas>=2.0
 tqdm>=4.60
 scipy>=1.10
+statsmodels>=0.14
+matplotlib>=3.7

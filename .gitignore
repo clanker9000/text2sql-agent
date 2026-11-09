@@ -8,3 +8,9 @@ data/_download/
 .vscode/
 CLAUDE.md
 !results/eval/
+!results/eval__allowlist+approval+prompt_rule+readonly/
+!results/attacks/
+!results/false_block/
+!results/stats/
+scratch/
+.venv/
