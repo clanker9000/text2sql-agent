@@ -14,5 +14,6 @@ CLAUDE.md
 !results/stats/
 scratch/
 .venv/
-IS469 Report_ Text-to-SQL Agent.docx
+IS469 Report_*.docx
 ~$*.docx
+IS469 Text-to-SQL*.pptx
